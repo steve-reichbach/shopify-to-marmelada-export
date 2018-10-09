@@ -99,7 +99,7 @@ with open(SHOPIFY_EXPORT_FILE, encoding='utf8') as importCsv:
                 # FIXME: add array of photos
                 'description*': html,
                 # 'tags*': row['Tags'].replace('\n', ''),
-                'tags*': 'צביע לפי מספרים, דיוקן אישי',
+                'tags*': 'צביעה לפי מספרים, דיוקן אישי',
                 'shipping_regular_post': '',
                 'shipping_regular_post_additional_product': '',
                 'shipping_courier': '',
