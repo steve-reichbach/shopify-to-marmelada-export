@@ -71,50 +71,61 @@ output_format = [
     'active'
 ]
 
-SHOPIFY_EXPORT_FILE = 'shopify_products_export.csv'
 export_rows = []
 
-with open(SHOPIFY_EXPORT_FILE, encoding='utf8') as importCsv:
+SHOPIFY_EXPORT_FILE = 'data/products_export.csv'
+TAGS = 'צביעה עצמית, צביעה משפחתית, ציורים על קנבס, צביעה לפי מספרים'
+CATEGORY = "Do It Yourself"
+PICKUP_AREA = 'תל אביב והמרכז'
+ACTIVE = 'פעיל'
+
+with open(file=SHOPIFY_EXPORT_FILE, encoding='utf8') as importCsv:
     reader = csv.DictReader(importCsv, fieldnames=input_format)
     index = 0
+    photos = []
+    changed = False
     for idx, row in enumerate(reader, start=0):
         html = row['Body (HTML)']
         if (html):
             html = html.replace('\n', '')
+            photos.insert(0, row['Image Src'])
             try:
                 price = int(float(row['Variant Price'])) + 10
-                pass
             except ValueError:
                 price = row['Variant Price']
                 print('Price is not a number: ' + row['Variant Price'])
+            photos.pop()
             export_row = {
                 'unique_id*': index,
                 'name*': row['Title'],
                 'price*': price,
-                # FIXME: parse it and update it
                 'price_after_discount': row['Variant Compare At Price'],
-                'category*': "אמנות ,Do It Yourself",
-                'sub_category': 'ציור',
-                'photos*': row['Image Src'],
-                # FIXME: add array of photos
+                'category*': CATEGORY,
+                'sub_category': '',
+                'photos*': ','.join(photos),
                 'description*': html,
-                # 'tags*': row['Tags'].replace('\n', ''),
-                'tags*': 'צביעה לפי מספרים, דיוקן אישי',
+                'tags*': TAGS,
                 'shipping_regular_post': '',
                 'shipping_regular_post_additional_product': '',
                 'shipping_courier': '',
                 'shipping_courier_additional_product': '',
                 'shipping_abroad': '',
                 'shipping_abroad_additional_product': '',
-                'shipping_pickup': 'תל אביב והמרכז',
+                'shipping_pickup': PICKUP_AREA,
                 'department': '',
                 'inventory': 1,
-                'active': 'פעיל'
+                'active': ACTIVE
             }
+            if changed == True:
+                photos = [row['Image Src']]
             export_rows.append(export_row)
             index += 1
+            changed = False
+        else:
+            photos.insert(0, row['Image Src'])
+            changed = True
 
-with open('output.csv', 'w', encoding='utf8') as exportCsv:
+with open(file='data/output.csv', mode='w', encoding='utf8') as exportCsv:
     writer = csv.DictWriter(exportCsv, fieldnames=output_format)
     writer.writeheader()
     for row in export_rows:
