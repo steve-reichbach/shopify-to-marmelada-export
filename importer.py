@@ -80,6 +80,7 @@ PICKUP_AREA = 'תל אביב והמרכז'
 ACTIVE = 'פעיל'
 SHIPPING_COURIER = 37
 SHIPPING_ABROAD = 70
+DEPARTMENT = 'צביעה לפי מספרים'
 
 with open(file=SHOPIFY_EXPORT_FILE, encoding='utf8') as import_csv:
     reader = csv.DictReader(import_csv, fieldnames=input_format)
@@ -92,7 +93,7 @@ with open(file=SHOPIFY_EXPORT_FILE, encoding='utf8') as import_csv:
             html = html.replace('\n', '')
             photos.insert(0, row['Image Src'])
             try:
-                price = int(float(row['Variant Price'])) + 10
+                price = int(float(row['Variant Price']))
             except ValueError:
                 price = row['Variant Price']
                 print('Price is not a number: ' + row['Variant Price'])
@@ -114,7 +115,7 @@ with open(file=SHOPIFY_EXPORT_FILE, encoding='utf8') as import_csv:
                 'shipping_abroad': SHIPPING_ABROAD,
                 'shipping_abroad_additional_product': '',
                 'shipping_pickup': PICKUP_AREA,
-                'department': '',
+                'department': DEPARTMENT,
                 'inventory': row['Variant Inventory Qty'],
                 'active': ACTIVE
             }
