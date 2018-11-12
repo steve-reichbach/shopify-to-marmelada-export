@@ -78,9 +78,11 @@ TAGS = 'צביעה עצמית, צביעה משפחתית, ציורים על קנ
 CATEGORY = "Do It Yourself"
 PICKUP_AREA = 'תל אביב והמרכז'
 ACTIVE = 'פעיל'
+SHIPPING_COURIER = 37
+SHIPPING_ABROAD = 70
 
-with open(file=SHOPIFY_EXPORT_FILE, encoding='utf8') as importCsv:
-    reader = csv.DictReader(importCsv, fieldnames=input_format)
+with open(file=SHOPIFY_EXPORT_FILE, encoding='utf8') as import_csv:
+    reader = csv.DictReader(import_csv, fieldnames=input_format)
     index = 0
     photos = []
     changed = False
@@ -107,13 +109,13 @@ with open(file=SHOPIFY_EXPORT_FILE, encoding='utf8') as importCsv:
                 'tags*': TAGS,
                 'shipping_regular_post': '',
                 'shipping_regular_post_additional_product': '',
-                'shipping_courier': '',
+                'shipping_courier': SHIPPING_COURIER,
                 'shipping_courier_additional_product': '',
-                'shipping_abroad': '',
+                'shipping_abroad': SHIPPING_ABROAD,
                 'shipping_abroad_additional_product': '',
                 'shipping_pickup': PICKUP_AREA,
                 'department': '',
-                'inventory': 1,
+                'inventory': row['Variant Inventory Qty'],
                 'active': ACTIVE
             }
             if changed == True:
@@ -125,8 +127,9 @@ with open(file=SHOPIFY_EXPORT_FILE, encoding='utf8') as importCsv:
             photos.insert(0, row['Image Src'])
             changed = True
 
-with open(file='data/output.csv', mode='w', encoding='utf8') as exportCsv:
-    writer = csv.DictWriter(exportCsv, fieldnames=output_format)
+with open(file='data/output.csv', mode='w', encoding='utf8') as export_csv:
+    writer = csv.DictWriter(export_csv, fieldnames=output_format)
     writer.writeheader()
-    for row in export_rows:
+    for row in export_rows[1:]:
+        # zero row is import's file header
         writer.writerow(row)
